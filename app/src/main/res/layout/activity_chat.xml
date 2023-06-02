@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ChatActivity">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/activityChat_recyclerView_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_margin="10dp"
+        android:layout_above="@id/activityChat_relativeLayout_sendMessageLayout"/>
+
+    <RelativeLayout
+        android:id="@+id/activityChat_relativeLayout_sendMessageLayout"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
+        <ImageButton
+            android:id="@+id/activityChat_imageButton_attach"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:padding="15dp"
+            android:src="@drawable/attach_icon"
+            android:contentDescription="Attach button" />
+
+        <ImageButton
+            android:id="@+id/activityChat_imageButton_camera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/activityChat_imageButton_attach"
+            android:layout_centerVertical="true"
+            android:padding="15dp"
+            android:src="@drawable/camera_icon"
+            android:contentDescription="Camera button" />
+
+
+        <EditText
+            android:id="@+id/ActivityChat_editText_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/activityChat_imageButton_camera"
+            android:layout_toStartOf="@id/activityChat_imageView_sendMessage"
+            android:layout_centerVertical="true"
+            android:padding="15dp"
+            android:hint="Aa"
+            android:autofillHints="Write text here"
+            android:inputType="textAutoCorrect" />
+
+        <ImageButton
+            android:id="@+id/activityChat_imageView_sendMessage"
+            android:src="@drawable/send_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:padding="15dp"
+            android:contentDescription="Send message button" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
