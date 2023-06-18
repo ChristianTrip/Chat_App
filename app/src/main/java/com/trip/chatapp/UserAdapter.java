@@ -16,7 +16,7 @@ import com.trip.chatapp.models.UserModel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> {
+public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
 
     private final Context context;
     private final List<UserModel> users = new ArrayList<>();
@@ -39,21 +39,22 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> 
 
     @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_row, parent, false);
-        return new MyViewHolder(view);
+        return new UserViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         UserModel user = users.get(position);
         holder.name.setText(user.getName());
         holder.email.setText(user.getEmail());
 
         holder.itemView.setOnClickListener(view -> {
-            Intent intent = new Intent(context, ChatActivity.class);
-            intent.putExtra("id", user.getId());
-            context.startActivity(intent);
+            Intent goToChat = new Intent(context, ChatActivity.class);
+            goToChat.putExtra("userId", user.getId());
+            goToChat.putExtra("userName", user.getName());
+            context.startActivity(goToChat);
         });
     }
 
@@ -62,17 +63,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> 
         return this.users.size();
     }
 
-    public static class MyViewHolder extends RecyclerView.ViewHolder{
-
+    public static class UserViewHolder extends RecyclerView.ViewHolder{
         private final TextView name, email;
 
-        public MyViewHolder(@NonNull View itemView) {
+        public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.userRow_textView_userName);
             email = itemView.findViewById(R.id.userRow_textView_userEmail);
         }
     }
-
-
 
 }

@@ -7,7 +7,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -15,15 +17,14 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.trip.chatapp.databinding.ActivityChatBinding;
@@ -34,10 +35,6 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class ChatActivity extends AppCompatActivity {
-
-    private static final String DATABASE_URL = "https://chat-app-6ffa2-default-rtdb.europe-west1.firebasedatabase.app";
-    private static final String STORAGE_URL = "gs://chat-app-6ffa2.appspot.com";
-    private static final FirebaseDatabase database = FirebaseDatabase.getInstance(DATABASE_URL);
     private DatabaseReference databaseReferenceSender, databaseReferenceReceiver;
     private StorageReference storageReference;
     private ActivityChatBinding binding;
@@ -62,24 +59,30 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        messageAdapter = new MessageAdapter(this);
+        storageReference = FirebaseService.getStorageReference();
         binding = ActivityChatBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        FirebaseStorage storage = FirebaseStorage.getInstance(STORAGE_URL);
-        storageReference = storage.getReference();
+        TextView receiverName = binding.tvChatReceiverName;
+        receiverName.setText(getIntent().getStringExtra("userName"));
 
-        String receiverId = getIntent().getStringExtra("id");
-        String senderRoom = FirebaseAuth.getInstance().getUid() + receiverId;
-        String receiverRoom = receiverId + FirebaseAuth.getInstance().getUid();
+        RecyclerView recycler = binding.activityChatRecyclerViewRecycler;
+        recycler.setAdapter(messageAdapter);
+        recycler.setLayoutManager(new LinearLayoutManager(this));
 
+        setupDatabaseReferenceListener();
+        setButtonListeners();
+    }
 
-        messageAdapter = new MessageAdapter(this);
-        binding.activityChatRecyclerViewRecycler.setAdapter(messageAdapter);
-        binding.activityChatRecyclerViewRecycler.setLayoutManager(new LinearLayoutManager(this));
-
-
-        databaseReferenceSender = database.getReference("messages").child(senderRoom);
-        databaseReferenceReceiver = database.getReference("messages").child(receiverRoom);
+    private void setupDatabaseReferenceListener(){
+        String senderId = FirebaseAuth.getInstance().getUid();
+        String receiverId = getIntent().getStringExtra("userId"); // id comes from the intent in user adapter
+        String senderRoom = senderId + receiverId;
+        String receiverRoom = receiverId + senderId;
+        databaseReferenceSender = FirebaseService.getDatabaseReference("messages").child(senderRoom);
+        databaseReferenceReceiver = FirebaseService.getDatabaseReference("messages").child(receiverRoom);
 
         databaseReferenceSender.addValueEventListener(new ValueEventListener() {
             @Override
@@ -90,12 +93,13 @@ public class ChatActivity extends AppCompatActivity {
                     messageAdapter.addMessage(messageModel);
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
         });
 
+    }
 
+    private void setButtonListeners(){
         ImageButton cameraButton = binding.activityChatImageButtonCamera;
         ImageButton attachButton = binding.activityChatImageButtonAttach;
         ImageButton sendButton = binding.activityChatImageViewSendMessage;
@@ -105,13 +109,13 @@ public class ChatActivity extends AppCompatActivity {
         attachButton.setOnClickListener(view -> choosePicture());
 
         sendButton.setOnClickListener(view -> {
-            String message = binding.ActivityChatEditTextMessage.getText().toString().trim();
+            EditText writeMessageField = binding.ActivityChatEditTextMessage;
+            String message = writeMessageField.getText().toString().trim();
             if (message.length() > 0){
                 sendMessage(message);
-                binding.ActivityChatEditTextMessage.setText("");
+                writeMessageField.setText("");
             }
         });
-
     }
 
     private void goToCamera() {
@@ -189,8 +193,6 @@ public class ChatActivity extends AppCompatActivity {
             double progressPercent = (100.00 * snapshot.getBytesTransferred() / snapshot.getTotalByteCount());
             progressDialog.setMessage("Percent: " + (int) progressPercent + "%");
         });
-
-
     }
 
     private void sendMessage(String message){

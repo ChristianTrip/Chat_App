@@ -28,7 +28,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHolder> {
+public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
 
     private final Context context;
     private final List<MessageModel> messages = new ArrayList<>();
@@ -51,13 +51,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHo
 
     @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_row, parent, false);
-        return new MyViewHolder(view);
+        return new MessageViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             messages.sort(Comparator.comparing(MessageModel::getTimeStampInMillis));
@@ -85,7 +85,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHo
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.gravity = Gravity.START;
             holder.main.setLayoutParams(params);
-
         }
 
         StorageReference storageReference = FirebaseStorage.getInstance().getReference("images/" + message.getImageId());
@@ -120,14 +119,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHo
         return this.messages.size();
     }
 
-    public static class MyViewHolder extends RecyclerView.ViewHolder{
+    public static class MessageViewHolder extends RecyclerView.ViewHolder{
 
         private final TextView sender, content, timeStamp;
-
         private final ImageView image;
         private final LinearLayout main;
 
-        public MyViewHolder(@NonNull View itemView) {
+        public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
             sender = itemView.findViewById(R.id.messageRow_TextView_sender);
             content = itemView.findViewById(R.id.messageRow_TextView_content);

@@ -5,13 +5,41 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ChatActivity">
 
+    <RelativeLayout
+        android:id="@+id/ll_chat_receiverInfo"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:background="@color/light_grey">
+
+        <ImageView
+            android:id="@+id/iv_chat_receiverPicture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/person_icon"
+            android:layout_centerVertical="true"/>
+        <TextView
+            android:id="@+id/tv_chat_receiverName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:text="receiver name"
+            android:layout_toEndOf="@+id/iv_chat_receiverPicture"/>
+    </RelativeLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/activityChat_recyclerView_recycler"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_margin="10dp"
-        android:layout_above="@id/activityChat_relativeLayout_sendMessageLayout"/>
+        android:layout_above="@id/activityChat_relativeLayout_sendMessageLayout"
+        android:layout_below="@id/ll_chat_receiverInfo"
+        android:layout_alignParentTop="false"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp" />
 
     <RelativeLayout
         android:id="@+id/activityChat_relativeLayout_sendMessageLayout"

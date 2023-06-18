@@ -2,7 +2,6 @@ package com.trip.chatapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -10,20 +9,19 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.trip.chatapp.databinding.ActivityChatsOverviewBinding;
 import com.trip.chatapp.models.UserModel;
 
 public class ChatsOverviewActivity extends AppCompatActivity {
 
-    private static final String DATABASE_URL = "https://chat-app-6ffa2-default-rtdb.europe-west1.firebasedatabase.app";
-    private static final FirebaseDatabase database = FirebaseDatabase.getInstance(DATABASE_URL);
+    private DatabaseReference databaseReference;
     private ActivityChatsOverviewBinding binding;
     private UserAdapter userAdapter;
 
@@ -31,13 +29,18 @@ public class ChatsOverviewActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityChatsOverviewBinding.inflate(getLayoutInflater());
-        DatabaseReference databaseReference = database.getReference("users");
-
+        databaseReference = FirebaseService.getDatabaseReference("users");
         userAdapter = new UserAdapter(this);
         setContentView(binding.getRoot());
 
-        binding.chatsOverviewRecycleViewRecycler.setAdapter(userAdapter);
-        binding.chatsOverviewRecycleViewRecycler.setLayoutManager(new LinearLayoutManager(this));
+        RecyclerView recycler = binding.chatsOverviewRecycleViewRecycler;
+        recycler.setAdapter(userAdapter);
+        recycler.setLayoutManager(new LinearLayoutManager(this));
+
+        setupDatabaseListener();
+    }
+
+    private void setupDatabaseListener(){
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -46,15 +49,12 @@ public class ChatsOverviewActivity extends AppCompatActivity {
                     String userID = dataSnapshot.getKey();
                     if (userID != null && !userID.equals(FirebaseAuth.getInstance().getUid())){
                         UserModel userModel = dataSnapshot.getValue(UserModel.class);
-                        Log.w("userModel",  "name: " + userModel.getName() + ", email: " + userModel.getEmail() + ", password: " + userModel.getPassword() + ", id: " + userModel.getId());
                         userAdapter.addUser(userModel);
                     }
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
     }
